@@ -1,0 +1,16 @@
+[project]
+name = "hemli"
+version = "1.0.0"
+authors = [{"name"="Alexey Kuzminich", "email"="akuzminich@gmail.com"}]
+description = "Url shortener web service and API"
+dependencies = [
+    "Django",
+]
+# requires-python = ">=3.7"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "local_settings"
+
+[build-system]
+requires = ["flit_core<4"]
+build-backend = "flit_core.buildapi"
