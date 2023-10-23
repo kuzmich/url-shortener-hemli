@@ -9,7 +9,8 @@ dependencies = [
 # requires-python = ">=3.7"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "local_settings"
+DJANGO_SETTINGS_MODULE = "hemli.settings"
+addopts = "--reuse-db"
 
 [build-system]
 requires = ["flit_core<4"]

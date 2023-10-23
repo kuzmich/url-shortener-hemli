@@ -1,6 +1,14 @@
 from django import forms
 
+from .models import ShortLink
 
-class ShortenerForm(forms.Form):
-    long_url = forms.URLField(label="Длинный URL")
-    custom_path = forms.CharField(label='Желаемый URL', required=False)
+
+class ShortenerForm(forms.ModelForm):
+    class Meta:
+        model = ShortLink
+        fields = ['url', 'path']
+        error_messages = {
+            'path': {
+                'unique': 'Такое сокращение уже занято.'
+            }
+        }

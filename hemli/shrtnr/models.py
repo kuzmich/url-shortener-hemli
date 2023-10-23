@@ -3,8 +3,8 @@ from django.db import models
 
 
 class ShortLink(models.Model):
-    url = models.URLField(unique=True)  # long url
-    path = models.CharField(max_length=10, unique=True)  # shortened to this path
+    url = models.URLField(verbose_name="Длинный URL")
+    path = models.CharField(max_length=10, unique=True, blank=True, verbose_name="Желаемое сокращение")
     created_at = models.DateTimeField(auto_now_add=True)
     num_views = models.IntegerField(default=0)
 
