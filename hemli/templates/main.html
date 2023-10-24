@@ -19,7 +19,7 @@
   <h2>Мои ссылки</h2>
   <dl>
     {% for link in my_links %}
-    <dt><a href="{% url 'redirect' link.path %}">{{ link.path }}</a></dt>
+    <dt><a href="{% url 'redirect' link.path %}">{{ link.path }}</a> (переходов: {{ link.num_views }})</dt>
     <dd>{{ link.url }}</dd>
     {% endfor %}
   </dl>

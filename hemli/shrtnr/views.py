@@ -2,10 +2,9 @@ import logging
 import secrets
 import string
 
-from django.db.models import F
-from django.contrib.sessions.backends.db import SessionStore
 from django.contrib.sessions.models import Session
-from django.http import HttpResponse, HttpResponseRedirect
+from django.core.cache import cache
+from django.db.models import F
 from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import ShortenerForm
@@ -25,13 +24,17 @@ def main(request):
         form = ShortenerForm(request.POST)
 
         if form.is_valid():
+            url = form.cleaned_data['url']
             path = form.cleaned_data['path']
+            
             link = ShortLink(
-                url=form.cleaned_data['url'],
+                url=url,
                 path=path if path else generate_path(),
             )
             link.save()
             link.sessions.add(session)
+
+            cache.set(f's-{path}', url)
             
             return redirect('main')
         else:
@@ -49,9 +52,12 @@ def main(request):
 
 
 def redirect_to_full(request, short_path):
-    link = get_object_or_404(ShortLink, path=short_path)
-    ShortLink.objects.filter(id=link.id).update(num_views=F('num_views') + 1)
-    return redirect(link.url)
+    if url := cache.get(f's-{short_path}'):
+        return redirect(url)
+    else:
+        link = get_object_or_404(ShortLink, path=short_path)
+        ShortLink.objects.filter(id=link.id).update(num_views=F('num_views') + 1)
+        return redirect(link.url)
 
 
 def generate_path(path_len=3):

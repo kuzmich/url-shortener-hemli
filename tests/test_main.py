@@ -132,3 +132,19 @@ def test_cant_use_too_long_path(client: Client):
     # Сервис сообщает об ошибке
     assert resp.status_code == 200
     assert 'Сокращение должно быть не длиннее 10 символов' in resp.content.decode()
+
+
+@pytest.mark.django_db
+def test_making_short_url_caches_it(client: Client):
+    # Пусть пользователь создал короткий URL
+    resp = client.post('/', {'url': 'http://long.url/here', 'path': 'shrt'})
+    assert resp.status_code == 302
+
+    short_link = ShortLink.objects.get()
+    short_link.delete()
+    
+    # Когда он переходит по это ссылке
+    # Сервер не обращается к базе, так как закешировал ссылку при создании
+    resp = client.get('/shrt')
+    assert resp.status_code == 302
+    assert resp.headers['location'] == 'http://long.url/here'
