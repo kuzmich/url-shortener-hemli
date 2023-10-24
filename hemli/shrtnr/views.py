@@ -1,3 +1,4 @@
+import logging
 import secrets
 import string
 
@@ -9,6 +10,9 @@ from django.shortcuts import render, redirect, get_object_or_404
 
 from .forms import ShortenerForm
 from .models import ShortLink
+
+
+logger = logging.getLogger(__name__)
 
 
 def main(request):
@@ -30,6 +34,8 @@ def main(request):
             link.sessions.add(session)
             
             return redirect('main')
+        else:
+            logger.warning('Invalid form input: %s', form.errors.as_json())
     else:
         form = ShortenerForm()
 
