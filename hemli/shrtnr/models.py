@@ -5,8 +5,8 @@ from django.db import models
 class ShortLink(models.Model):
     url = models.URLField(verbose_name="Длинный URL")
     path = models.CharField(max_length=10, unique=True, blank=True, verbose_name="Желаемое сокращение")
-    created_at = models.DateTimeField(auto_now_add=True)
-    num_views = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создано")
+    num_views = models.IntegerField(default=0, verbose_name="Переходы")
 
     sessions = models.ManyToManyField(Session, related_name='short_links')
 
