@@ -4,15 +4,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Hemingway's links - URL shortener service</title>
+  <title>Ссылки Хэмингуэя - сервис сокращения ссылок</title>
   <!-- <link rel="stylesheet" href="styles.css"> -->
 </head>
 
 <body>
-  <h1>Shrinks your links all the way down!</h1>
+  <h1>Сжимаем ваши ссылки на все сто!</h1>
   <form method="post"  action="" method="post">
     {% csrf_token %}
-    {{ form }}
+    {{ form.as_div }}
     <input type="submit" value="Сократить">
   </form>
   {% if my_links %}

@@ -8,7 +8,12 @@ class ShortenerForm(forms.ModelForm):
         model = ShortLink
         fields = ['url', 'path']
         error_messages = {
+            'url': {
+                'required': 'Обязательное поле.',
+                'invalid': 'Введите корректный URL.'
+            },
             'path': {
-                'unique': 'Такое сокращение уже занято.'
-            }
+                'unique': 'Такое сокращение уже занято.',
+                'max_length': 'Сокращение должно быть не длиннее 10 символов.'
+            },
         }

@@ -13,7 +13,7 @@ def test_can_shorten_url(client: Client):
     resp = client.post('/', {'url': long_url}, follow=True)
     assert resp.status_code == 200  # 302
     
-    # То он видит сокращенный URL
+    # То видит сокращенный URL
     short_links = resp.context['my_links']
     assert short_links.count() == 1
     
@@ -33,13 +33,14 @@ def test_can_use_custom_path(client: Client):
     resp = client.post('/', {'url': long_url, 'path': custom_path})
     assert resp.status_code == 302
     
-    # То сервис создает короткий URL с этим сокращением
+    # Сервис создает короткий URL с этим сокращением
     assert ShortLink.objects.filter(url=long_url, path=custom_path).exists()
 
 
 @pytest.mark.django_db
 def test_cant_use_already_used_custom_path(client: Client):
-    # Пусть пользователь хочет использовать свое сокращение, но оно уже использовано кем-то другим
+    # Пусть пользователь хочет использовать свое сокращение,
+    # но оно уже использовано кем-то другим
     ShortLink.objects.create(url='https://some.long/url', path='OMG')
     
     # Когда он вводит это сокращение в форму
@@ -64,7 +65,7 @@ def test_can_shorten_already_shortened_url(client: Client):
     resp = client.post('/', {'url': long_url})
     assert resp.status_code == 302
     
-    # То сервис создает еще одно сокращение для такого URL
+    # Сервис создает еще одно сокращение для такого URL
     assert ShortLink.objects.filter(url=long_url).count() == 2
 
 
@@ -99,3 +100,35 @@ def test_following_url_incr_views(client: Client):
     short_link.refresh_from_db()
     assert short_link.num_views == 1
 
+
+@pytest.mark.django_db
+def test_cant_shorten_empty_url(client: Client):
+    # Пусть злобный хацкер хочет хакнуть наш сервис
+    # Когда он отправляет пустую строку вместо URL
+    resp = client.post('/', {'url': ''})
+    
+    # Сервис сообщает об ошибке
+    assert resp.status_code == 200
+    assert 'Обязательное поле' in resp.content.decode()
+
+
+@pytest.mark.django_db
+def test_cant_shorten_non_url_str(client: Client):
+    # Пусть злобный хацкер хочет хакнуть наш сервис
+    # Когда он отправляет какую-нибудь строку вместо URL
+    resp = client.post('/', {'url': 'блаблабла'})
+
+    # Сервис сообщает об ошибке
+    assert resp.status_code == 200
+    assert 'Введите корректный URL' in resp.content.decode()
+
+
+@pytest.mark.django_db
+def test_cant_use_too_long_path(client: Client):
+    # Пусть злобный хацкер хочет хакнуть наш сервис
+    # Когда он отправляет слишком длинное сокращение
+    resp = client.post('/', {'url': 'http://long.url/there', 'path': 'a' * 50})
+
+    # Сервис сообщает об ошибке
+    assert resp.status_code == 200
+    assert 'Сокращение должно быть не длиннее 10 символов' in resp.content.decode()
