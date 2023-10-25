@@ -11,6 +11,8 @@ redis = "*"
 [dev-packages]
 pytest = "*"
 pytest-django = "*"
+ipython = "*"
+django-extensions = "*"
 
 [requires]
 python_version = "3.11"
