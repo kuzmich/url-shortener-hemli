@@ -46,7 +46,7 @@ def main(request):
         form = ShortenerForm()
 
     my_links = session.short_links.order_by('-created_at')
-    paginator = Paginator(my_links, 5)
+    paginator = Paginator(my_links, settings.LINKS_PER_PAGE)
     page_obj = paginator.get_page(request.GET.get('page'))
     
     return render(

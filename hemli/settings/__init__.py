@@ -33,6 +33,8 @@ SESSION_COOKIE_AGE = 60 * 60 * 24 * 180  # 180 дней
 SHORT_PATH_LEN = 3
 SHORT_PATH_ABC = string.ascii_letters + string.digits
 
+LINKS_PER_PAGE = 5
+
 REDIS_URL = "redis://127.0.0.1:6379"
 
 STATICFILES_DIRS = [PACKAGE_DIR / 'static']
