@@ -137,14 +137,15 @@ def test_cant_use_too_long_path(client: Client):
 @pytest.mark.django_db
 def test_making_short_url_caches_it(client: Client):
     # Пусть пользователь создал короткий URL
-    resp = client.post('/', {'url': 'http://long.url/here', 'path': 'shrt'})
+    resp = client.post('/', {'url': 'http://long.url/here'})
     assert resp.status_code == 302
 
     short_link = ShortLink.objects.get()
+    path = short_link.path
     short_link.delete()
     
-    # Когда он переходит по это ссылке
+    # Когда он переходит по этой ссылке
     # Сервер не обращается к базе, так как закешировал ссылку при создании
-    resp = client.get('/shrt')
+    resp = client.get(f'/{path}')
     assert resp.status_code == 302
     assert resp.headers['location'] == 'http://long.url/here'
