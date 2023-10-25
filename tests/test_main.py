@@ -1,7 +1,12 @@
+import itertools
+
 from django.test import Client
 import pytest
 
 from hemli.shrtnr.models import ShortLink
+
+
+pytestmark = pytest.mark.usefixtures("redis")
 
 
 @pytest.mark.django_db
@@ -149,3 +154,27 @@ def test_making_short_url_caches_it(client: Client):
     resp = client.get(f'/{path}')
     assert resp.status_code == 302
     assert resp.headers['location'] == 'http://long.url/here'
+
+
+@pytest.mark.django_db
+def test_generate_short_path(client: Client, settings):
+    # Пусть использованы все возможные сокращения для текущей длины
+    settings.SHORT_PATH_ABC = 'abc'
+    settings.SHORT_PATH_LEN = 2
+    
+    ShortLink.objects.bulk_create([
+        ShortLink(url='http://long.url', path=''.join(path))
+        for path in itertools.product('abc', repeat=2)
+    ])
+    assert ShortLink.objects.count() == 9
+    
+    # Когда пользователь добавляет новое сокращение
+    resp = client.post('/', {'url': 'http://long.url'}, follow=True)
+    assert resp.status_code == 200
+
+    assert ShortLink.objects.count() == 10
+    
+    # Сервис генерирует более длинное сокращение
+    assert len(resp.context['my_links'][0].path) == 3
+
+    

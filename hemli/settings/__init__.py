@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+import string
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 PACKAGE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +30,11 @@ ALLOWED_HOSTS = []
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 180  # 180 дней
 
+SHORT_PATH_LEN = 3
+SHORT_PATH_ABC = string.ascii_letters + string.digits
+
+REDIS_URL = "redis://127.0.0.1:6379"
+
 
 # Application definition
 
@@ -39,9 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #
+
     'django_extensions',
-    #
+
     'hemli.shrtnr',
 ]
 
@@ -93,7 +99,7 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379",
+        "LOCATION": REDIS_URL,
         "TIMEOUT": 3600 * 5,
     }
 }

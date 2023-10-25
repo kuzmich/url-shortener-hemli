@@ -1,9 +1,10 @@
 import logging
 import secrets
-import string
 
+from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core.cache import cache
+from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -27,14 +28,15 @@ def main(request):
             url = form.cleaned_data['url']
             path = form.cleaned_data['path']
             
-            link = ShortLink(
-                url=url,
-                path=path if path else generate_path(),
-            )
-            link.save()
+            if path:
+                link = ShortLink(url=url, path=path)
+                link.save()
+            else:
+                link = create_short_link(url)
+            
             link.sessions.add(session)
 
-            cache.set(f's-{path}', url)
+            cache.set(f's-{link.path}', url)
             
             return redirect('main')
         else:
@@ -42,7 +44,7 @@ def main(request):
     else:
         form = ShortenerForm()
 
-    my_links = session.short_links.all()
+    my_links = session.short_links.order_by('-created_at')
     
     return render(
         request,
@@ -60,6 +62,41 @@ def redirect_to_full(request, short_path):
         return redirect(link.url)
 
 
-def generate_path(path_len=3):
-    alphabet = string.ascii_letters + string.digits
-    return ''.join(secrets.choice(alphabet) for i in range(path_len))
+def generate_path(path_len=None):
+    if path_len is None:
+        path_len = settings.SHORT_PATH_LEN
+    abc = settings.SHORT_PATH_ABC
+    return ''.join(secrets.choice(abc) for _ in range(path_len))
+
+
+def create_short_link(url):
+    num_generations = 0
+    short_path_len = cache.get('short_path_len', settings.SHORT_PATH_LEN)
+
+    while True:
+        if num_generations >= 2:
+            short_path_len += 1
+            num_generations = 0
+
+            if short_path_len > 10:
+                raise Exception("Can't generate short path")
+            
+        path = generate_path(short_path_len)
+        num_generations += 1
+        
+        logger.debug(
+            "Generated path '%s' (round %d, path len: %d)",
+            path, num_generations, short_path_len
+        )
+            
+        try:
+            with transaction.atomic():
+                link = ShortLink(url=url, path=path)
+                link.save()
+            break
+        except IntegrityError as e:
+            logger.debug('%r', e)
+
+    cache.set('short_path_len', short_path_len, None)
+
+    return link

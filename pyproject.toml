@@ -9,7 +9,7 @@ dependencies = [
 # requires-python = ">=3.7"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "hemli.settings"
+DJANGO_SETTINGS_MODULE = "hemli.settings.tests"
 addopts = "--reuse-db"
 
 [build-system]
