@@ -4,6 +4,7 @@ import secrets
 from django.conf import settings
 from django.contrib.sessions.models import Session
 from django.core.cache import cache
+from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
 from django.db.models import F
 from django.shortcuts import render, redirect, get_object_or_404
@@ -45,16 +46,19 @@ def main(request):
         form = ShortenerForm()
 
     my_links = session.short_links.order_by('-created_at')
+    paginator = Paginator(my_links, 5)
+    page_obj = paginator.get_page(request.GET.get('page'))
     
     return render(
         request,
         'main.html',
-        {'form': form, 'my_links': my_links}
+        {'form': form, 'my_links': page_obj, 'page_obj': page_obj}
     )
 
 
 def redirect_to_full(request, short_path):
     if url := cache.get(f's-{short_path}'):
+        ShortLink.objects.filter(path=short_path).update(num_views=F('num_views') + 1)
         return redirect(url)
     else:
         link = get_object_or_404(ShortLink, path=short_path)

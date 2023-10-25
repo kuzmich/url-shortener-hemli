@@ -1,0 +1,32 @@
+{% with pgntr=page_obj.paginator %}
+<nav aria-label="Мои ссылки: страницы">
+  <ul class="pagination">
+    <li class="page-item {% if not page_obj.has_previous %}disabled{% endif%}">
+      <a {% if page_obj.has_previous %}href="?page={{ page_obj.previous_page_number }}"{% endif %} class="page-link">
+	<span class="visually-hidden">Предыдущая страница</span>
+        <span aria-hidden="true">«</span>
+      </a>
+    </li>
+  {# for num in pgntr.get_elided_page_range(page_obj.number, on_each_side=1, on_ends=1) #}
+  {% for num in pgntr.page_range %}
+    <li class="page-item {% if num == page_obj.number %}active{% endif%}"
+	{% if num == page_obj.number %}aria-current="page"{% endif%}
+	{% if num == pgntr.ELLIPSIS %}role="separator"{% endif %}>
+    {% if num == pgntr.ELLIPSIS %}
+      {{ num }}
+    {% else %}
+      <a href="?page={{ num }}" class="page-link">
+        <span class="visually-hidden">page </span>{{ num }}
+      </a>
+    {% endif %}
+    </li>
+  {% endfor %}
+    <li class="page-item {% if not page_obj.has_next %}disabled{% endif %}">
+      <a {% if page_obj.has_next %}href="?page={{ page_obj.next_page_number }}"{% endif %} class="page-link">
+        <span class="visually-hidden">Следующая страница</span>
+	<span aria-hidden="true">»</span>
+      </a>
+    </li>
+  </ul>
+</nav>
+{% endwith %}

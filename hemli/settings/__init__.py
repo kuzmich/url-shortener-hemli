@@ -35,6 +35,12 @@ SHORT_PATH_ABC = string.ascii_letters + string.digits
 
 REDIS_URL = "redis://127.0.0.1:6379"
 
+STATICFILES_DIRS = [PACKAGE_DIR / 'static']
+
+BOOTSTRAP5 = {
+    'set_placeholder': False,
+}
+
 
 # Application definition
 
@@ -47,6 +53,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'django_extensions',
+    'django_bootstrap5',
 
     'hemli.shrtnr',
 ]
