@@ -4,6 +4,7 @@ services:
   mysql:
     image: mysql:8
     environment:
+      MYSQL_DATABASE: hemli
       MYSQL_ROOT_PASSWORD: iamroot
     volumes:
       - mysql_data:/var/lib/mysql

@@ -7,8 +7,12 @@
 ```
 $ git clone https://github.com/kuzmich/url-shortener-hemli.git
 $ cd url-shortener-hemli
+
 $ docker compose build web
 $ docker compose up
+
+# при первом запуске дождитесь инициализации базы данных
+$ docker compose exec web pipenv run ./manage.py migrate
 ```
 
 Откройте в браузере страницу по адресу http://127.0.0.1:8000/
