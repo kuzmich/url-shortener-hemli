@@ -35,7 +35,7 @@ SHORT_PATH_ABC = string.ascii_letters + string.digits
 
 LINKS_PER_PAGE = 5
 
-REDIS_URL = "redis://127.0.0.1:6379"
+REDIS_URL = "redis://redis:6379"
 
 STATICFILES_DIRS = [PACKAGE_DIR / 'static']
 
@@ -100,7 +100,7 @@ DATABASES = {
         'NAME': 'hemli',
         'USER': 'root',
         'PASSWORD': 'iamroot',
-        'HOST': '127.0.0.1',
+        'HOST': 'mysql',
         'PORT': '3306'
     }
 }

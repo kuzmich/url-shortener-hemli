@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cad30965b4ead6913528a8029f6737bf54a5ecca228e515ac98c8c4dba84b261"
+            "sha256": "3b31e53649cb3a43ec25e21ff036b250a83742da00c1564b75be5d62ca540bd9"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -41,6 +41,10 @@
             "index": "pypi",
             "markers": "python_version >= '3.7'",
             "version": "==23.3"
+        },
+        "hemli": {
+            "editable": true,
+            "file": "."
         },
         "mysqlclient": {
             "hashes": [

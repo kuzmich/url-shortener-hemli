@@ -5,17 +5,23 @@ services:
     image: mysql:8
     environment:
       MYSQL_ROOT_PASSWORD: iamroot
-    ports:
-      - "127.0.0.1:3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
   redis:
     image: redis:7
-    ports:
-      - "127.0.0.1:6379:6379"
     volumes:
       - redis_data:/data
+
+  web:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - .:/hemli
+    depends_on:
+      - mysql
+      - redis
 
 volumes:
   mysql_data:

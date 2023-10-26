@@ -1,6 +1,7 @@
 from . import *
 
-REDIS_URL = "redis://127.0.0.1:6379/9"
+
+REDIS_URL = "redis://redis:6379/9"
 CACHES['default']['LOCATION'] = REDIS_URL
 
 
