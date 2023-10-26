@@ -20,7 +20,7 @@ def test_can_shorten_url(client: Client):
     
     # То видит сокращенный URL
     short_links = resp.context['my_links']
-    assert short_links.count() == 1
+    assert len(short_links.object_list) == 1
     
     short_link = short_links[0]
     assert short_link.url == long_url
@@ -137,6 +137,17 @@ def test_cant_use_too_long_path(client: Client):
     # Сервис сообщает об ошибке
     assert resp.status_code == 200
     assert 'Сокращение должно быть не длиннее 10 символов' in resp.content.decode()
+
+
+@pytest.mark.django_db
+def test_can_use_invalid_session_id(client: Client):
+    # Пусть злобный хакер хочет хакнуть наш сервис
+    # Когда он заходит на сайт с несуществующим id сессии
+    resp = client.get('/', headers={'Cookie': 'sessionid=1234567890'})
+    assert resp.status_code == 200
+    
+    # Сервер создает новую сессию
+    assert 'sessionid' in resp.cookies
 
 
 @pytest.mark.django_db

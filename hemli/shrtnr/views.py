@@ -17,10 +17,12 @@ logger = logging.getLogger(__name__)
 
 
 def main(request):
-    if not request.session.session_key:
+    session_key = request.session.session_key
+    if not session_key or not Session.objects.filter(session_key=session_key).exists():
         request.session.create()
+        session_key = request.session.session_key
         
-    session = Session.objects.get(session_key=request.session.session_key)
+    session = Session.objects.get(session_key=session_key)
     
     if request.method == 'POST':
         form = ShortenerForm(request.POST)
