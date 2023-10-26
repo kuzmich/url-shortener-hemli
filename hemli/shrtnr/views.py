@@ -30,17 +30,10 @@ def main(request):
         if form.is_valid():
             url = form.cleaned_data['url']
             path = form.cleaned_data['path']
-            
-            if path:
-                link = ShortLink(url=url, path=path)
-                link.save()
-            else:
-                link = create_short_link(url)
-            
-            link.sessions.add(session)
 
-            cache.set(f's-{link.path}', url)
+            link = create_short_link(url, path, session)
             
+            cache.set(f's-{link.path}', url)
             return redirect('main')
         else:
             logger.warning('Invalid form input: %s', form.errors.as_json())
@@ -58,24 +51,12 @@ def main(request):
     )
 
 
-def redirect_to_full(request, short_path):
-    if url := cache.get(f's-{short_path}'):
-        ShortLink.objects.filter(path=short_path).update(num_views=F('num_views') + 1)
-        return redirect(url)
-    else:
-        link = get_object_or_404(ShortLink, path=short_path)
-        ShortLink.objects.filter(id=link.id).update(num_views=F('num_views') + 1)
-        return redirect(link.url)
-
-
-def generate_path(path_len=None):
-    if path_len is None:
-        path_len = settings.SHORT_PATH_LEN
-    abc = settings.SHORT_PATH_ABC
-    return ''.join(secrets.choice(abc) for _ in range(path_len))
-
-
-def create_short_link(url):
+def create_short_link(url, path, session):
+    if path:
+        link = ShortLink(url=url, path=path, session=session)
+        link.save()
+        return link
+    
     num_generations = 0
     short_path_len = cache.get('short_path_len', settings.SHORT_PATH_LEN)
 
@@ -97,7 +78,7 @@ def create_short_link(url):
             
         try:
             with transaction.atomic():
-                link = ShortLink(url=url, path=path)
+                link = ShortLink(url=url, path=path, session=session)
                 link.save()
             break
         except IntegrityError as e:
@@ -106,3 +87,20 @@ def create_short_link(url):
     cache.set('short_path_len', short_path_len, None)
 
     return link
+
+
+def generate_path(path_len=None):
+    if path_len is None:
+        path_len = settings.SHORT_PATH_LEN
+    abc = settings.SHORT_PATH_ABC
+    return ''.join(secrets.choice(abc) for _ in range(path_len))
+
+
+def redirect_to_full(request, short_path):
+    if url := cache.get(f's-{short_path}'):
+        ShortLink.objects.filter(path=short_path).update(num_views=F('num_views') + 1)
+        return redirect(url)
+    else:
+        link = get_object_or_404(ShortLink, path=short_path)
+        ShortLink.objects.filter(id=link.id).update(num_views=F('num_views') + 1)
+        return redirect(link.url)

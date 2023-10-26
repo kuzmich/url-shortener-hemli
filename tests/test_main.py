@@ -43,10 +43,10 @@ def test_can_use_custom_path(client: Client):
 
 
 @pytest.mark.django_db
-def test_cant_use_already_used_custom_path(client: Client):
+def test_cant_use_already_used_custom_path(client: Client, session_key):
     # Пусть пользователь хочет использовать свое сокращение,
     # но оно уже использовано кем-то другим
-    ShortLink.objects.create(url='https://some.long/url', path='OMG')
+    ShortLink.objects.create(url='https://some.long/url', path='OMG', session_id=session_key)
     
     # Когда он вводит это сокращение в форму
     long_url = 'https://docs.google.com/document/d/1La9LOrj8qdpt4CVJOYAhuIrK0L0SOVIxfYp4CC5yU3A/edit'
@@ -60,11 +60,11 @@ def test_cant_use_already_used_custom_path(client: Client):
 
 
 @pytest.mark.django_db
-def test_can_shorten_already_shortened_url(client: Client):
+def test_can_shorten_already_shortened_url(client: Client, session_key):
     # Пусть пользователь хочет сократить URL,
     # Но кто-то уже сокращал такой URl
     long_url = 'https://docs.google.com/document/d/1La9LOrj8qdpt4CVJOYAhuIrK0L0SOVIxfYp4CC5yU3A/edit'
-    ShortLink.objects.create(url=long_url, path='OMG')
+    ShortLink.objects.create(url=long_url, path='OMG', session_id=session_key)
     
     # Когда он вводит этот URL в форму
     resp = client.post('/', {'url': long_url})
@@ -75,11 +75,11 @@ def test_can_shorten_already_shortened_url(client: Client):
 
 
 @pytest.mark.django_db
-def test_can_follow_short_url(client: Client):
+def test_can_follow_short_url(client: Client, session_key):
     # Пусть в базе есть сокращенный URL
     long_url = 'https://docs.google.com/document/d/1La9LOrj8qdpt4CVJOYAhuIrK0L0SOVIxfYp4CC5yU3A/edit'
     short_path = 'aSd'
-    ShortLink.objects.create(url=long_url, path=short_path)
+    ShortLink.objects.create(url=long_url, path=short_path, session_id=session_key)
 
     # Когда пользователь переходит по нему
     resp = client.get(f'/{short_path}')
@@ -90,11 +90,11 @@ def test_can_follow_short_url(client: Client):
 
 
 @pytest.mark.django_db
-def test_following_url_incr_views(client: Client):
+def test_following_url_incr_views(client: Client, session_key):
     # Пусть в базе есть сокращенный URL
     long_url = 'https://docs.google.com/document/d/1La9LOrj8qdpt4CVJOYAhuIrK0L0SOVIxfYp4CC5yU3A/edit'
     short_path = 'aSd'
-    short_link = ShortLink.objects.create(url=long_url, path=short_path)
+    short_link = ShortLink.objects.create(url=long_url, path=short_path, session_id=session_key)
     assert short_link.num_views == 0
 
     # Когда пользователь переходит по нему
@@ -168,13 +168,13 @@ def test_making_short_url_caches_it(client: Client):
 
 
 @pytest.mark.django_db
-def test_generate_short_path(client: Client, settings):
+def test_generate_short_path(client: Client, settings, session_key):
     # Пусть использованы все возможные сокращения для текущей длины
     settings.SHORT_PATH_ABC = 'abc'
     settings.SHORT_PATH_LEN = 2
     
     ShortLink.objects.bulk_create([
-        ShortLink(url='http://long.url', path=''.join(path))
+        ShortLink(url='http://long.url', path=''.join(path), session_id=session_key)
         for path in itertools.product('abc', repeat=2)
     ])
     assert ShortLink.objects.count() == 9

@@ -1,3 +1,4 @@
+from django.contrib.sessions.backends.db import SessionStore
 import pytest
 from redis import Redis
 
@@ -10,3 +11,10 @@ def redis(settings):
 
     # client.flushdb()
     client.connection_pool.disconnect()
+
+
+@pytest.fixture
+def session_key():
+    s = SessionStore()
+    s.create()
+    yield s.session_key
