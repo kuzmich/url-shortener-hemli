@@ -40,7 +40,7 @@ $ docker compose exec web pipenv run pytest -v tests/
 ```
 
 ## Настройки
-В файле `hemli/shrtnr/__init__.py` есть несколько настроек:
+В файле `hemli/settings/__init__.py` есть несколько настроек:
 
 - `SESSION_COOKIE_AGE`: сколько времени пользователь видит свои ссылки
 - `LINKS_PER_PAGE`: количество ссылок на странице
