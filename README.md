@@ -2,8 +2,11 @@
 
 ## Запуск проекта (для разработки)
 Все упаковано в докер-контейнеры, и только порт Django-сервера виден наружу.
+Если возникают ошибки, [обновите Docker](https://docs.docker.com/engine/install/).
 
 ```
+$ git clone https://github.com/kuzmich/url-shortener-hemli.git
+$ cd url-shortener-hemli
 $ docker compose build web
 $ docker compose up
 ```
