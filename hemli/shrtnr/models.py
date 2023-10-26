@@ -10,6 +10,10 @@ class ShortLink(models.Model):
 
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='short_links')
 
+    class Meta:
+        verbose_name = 'Сокращение'
+        verbose_name_plural = 'Сокращения'
+
     def __str__(self):
         return self.path
     

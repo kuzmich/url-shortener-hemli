@@ -17,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 def main(request):
+    """Создает и отображает ссылки"""
+
     session_key = request.session.session_key
     if not session_key or not Session.objects.filter(session_key=session_key).exists():
         request.session.create()
@@ -52,6 +54,8 @@ def main(request):
 
 
 def create_short_link(url, path, session):
+    """Создает сокращение и обрабатывает ситуацию, если короткая ссылка уже есть в базе"""
+
     if path:
         link = ShortLink(url=url, path=path, session=session)
         link.save()
@@ -90,6 +94,8 @@ def create_short_link(url, path, session):
 
 
 def generate_path(path_len=None):
+    """Генерирует короткую ссылку"""
+
     if path_len is None:
         path_len = settings.SHORT_PATH_LEN
     abc = settings.SHORT_PATH_ABC
@@ -97,6 +103,8 @@ def generate_path(path_len=None):
 
 
 def redirect_to_full(request, short_path):
+    """Перенаправляет пользователя на длинный URL"""
+
     if url := cache.get(f's-{short_path}'):
         ShortLink.objects.filter(path=short_path).update(num_views=F('num_views') + 1)
         return redirect(url)
