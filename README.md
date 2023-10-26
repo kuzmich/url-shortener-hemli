@@ -1,21 +1,37 @@
 # Сервис сокращения ссылок
 
+
 ## Запуск проекта (для разработки)
 Все упаковано в докер-контейнеры, и только порт Django-сервера виден наружу.
 Если возникают ошибки, [обновите Docker](https://docs.docker.com/engine/install/).
 
+### Первый раз
 ```
 $ git clone https://github.com/kuzmich/url-shortener-hemli.git
 $ cd url-shortener-hemli
 
 $ docker compose build web
+
+# Дождитесь инициализации базы данных (может занять около минуты)
+# Затем остановите контейнер (`Ctrl-C`)
+$ docker compose up mysql
+
 $ docker compose up
 
-# при первом запуске дождитесь инициализации базы данных
 $ docker compose exec web pipenv run ./manage.py migrate
 ```
 
+### Последующие разы
+```
+$ docker compose up
+```
+
 Откройте в браузере страницу по адресу http://127.0.0.1:8000/
+
+## Запуск тестов
+```
+$ docker compose exec web pipenv run pytest -v tests/
+```
 
 ## Настройки
 В файле hemli/shrtnr/__init__.py есть несколько настроек:
